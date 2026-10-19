@@ -1,0 +1,90 @@
+@base = http://localhost:8080
+@token = COLE_O_JWT
+@analyticsToken = COLE_O_TOKEN_ELEVADO
+@deviceKey = COLE_A_CHAVE_DO_DISPOSITIVO
+@date = 2026-10-07
+
+### Login
+POST {{base}}/api/auth/login
+Content-Type: application/json
+
+{"email":"admin@example.com","password":"CONFIGURE_SENHA"}
+
+### Usuário operador
+POST {{base}}/api/users
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"name":"Operador","email":"operador@example.com","password":"CONFIGURE_SENHA_SEGURA","role":"OPERADOR"}
+
+### Tipo
+POST {{base}}/api/screws
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"name":"M6","description":"Parafuso sextavado","specifications":"Aço; 20 mm"}
+
+### Dispositivo: guarde apiKey retornada
+POST {{base}}/api/devices
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"deviceId":"ESP32-001","name":"Máquina 1"}
+
+### Configure o ID do tipo com a resposta anterior
+POST {{base}}/api/batches
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"operationId":"OP-2026-001","target":10000,"screwTypeId":1,"deviceId":"ESP32-001"}
+
+### Iniciar (ajuste ID do lote)
+POST {{base}}/api/batches/1/start
+Authorization: Bearer {{token}}
+
+### Evento: atualize o timestamp para o instante real, após início
+POST {{base}}/api/production/events
+X-Device-Key: {{deviceKey}}
+Content-Type: application/json
+
+{"deviceId":"ESP32-001","operationId":"OP-2026-001","eventId":"11111111-1111-4111-8111-111111111111","timestamp":"2026-10-07T12:30:15Z"}
+
+### Repita o evento exatamente igual para verificar idempotência
+### Estado
+GET {{base}}/api/batches/1
+Authorization: Bearer {{token}}
+
+### Histórico
+GET {{base}}/api/batches/1/events?page=0&size=50
+Authorization: Bearer {{token}}
+
+### Pausar
+POST {{base}}/api/batches/1/pause
+Authorization: Bearer {{token}}
+
+### Retomar
+POST {{base}}/api/batches/1/resume
+Authorization: Bearer {{token}}
+
+### Finalizar: primeiro pare a máquina e esvazie a fila
+POST {{base}}/api/batches/1/finish
+Authorization: Bearer {{token}}
+
+### Analytics
+POST {{base}}/api/auth/analytics/unlock
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"password":"CONFIGURE_SENHA_ANALYTICS_OU_DO_USUARIO"}
+
+### Total diário
+GET {{base}}/api/analytics/daily?date={{date}}
+Authorization: Bearer {{analyticsToken}}
+
+### Produção por hora
+GET {{base}}/api/analytics/hourly?from={{date}}&to={{date}}
+Authorization: Bearer {{analyticsToken}}
+
+### Relatório
+GET {{base}}/api/analytics/report/pdf?from={{date}}&to={{date}}
+Authorization: Bearer {{analyticsToken}}

@@ -1,0 +1,26 @@
+target/
+.tools/
+.env
+.idea/
+.vscode/
+*.log
+*.iml
+
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+__pycache__/
+
+# Configuracoes e dados locais
+.env.*
+!.env.example
+/PRJFINAL.sql
+.metadata/
+.settings/
+.classpath
+.project
+*.class
+*.jks
+*.p12
+*.pfx
+*.key
